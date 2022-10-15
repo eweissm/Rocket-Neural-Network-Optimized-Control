@@ -22,6 +22,6 @@ $$\theta (t+1) = \theta (t) + \Delta \theta$$
 
 The model of drag used in this problem is vastly simplified and will be soley a function of the airspeed, the air desity and a constant, wre $C_d$ is the coeffifient of drag and $rho$ is the air density as a function of $d_y$. Likewise, the model used for air density has been simplified down to:
 
-$$\rho  =1.2250 \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\right]}
+$$\rho  =\rho _{b}\exp \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\right] =1.2250 *\exp{\left[{\frac {-9.81 * .0289644\left(d_y\right)}{8.3145^{*}(288.15)}}\right]} = 1.2250 *\exp{[-1.186 * 10^{-4}* d_y]}$$
 
  
