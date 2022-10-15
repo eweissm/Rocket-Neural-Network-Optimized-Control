@@ -14,4 +14,14 @@ $$d_x(t+1) = d_x(t)+Vx(t)*\Delta t - \frac{1}{2}*\Delta t^2 \alpha sin(\theta)$$
 
 $$d_y(t+1) = d_y(t)+Vy(t)*\Delta t - \frac{1}{2}*\Delta t^2 (\alpha*cos(\theta)-g)$$
 
-$$v_x(t+1) = V_x(t)- \Delta t \alpha cos(\theta)$$
+$$v_x(t+1) = v_x(t)- \Delta t \alpha sin(\theta) - C_d \rho v_x(t)^2 $$
+
+$$v_y(t+1) = v_y(t)+ \Delta t \alpha cos(\theta)- C_d \rho v_y(t)^2$$
+
+$$\theta (t+1) = \theta (t) + \Delta \theta$$
+
+The model of drag used in this problem is vastly simplified and will be soley a function of the airspeed, the air desity and a constant, wre $C_d$ is the coeffifient of drag and $rho$ is the air density as a function of $d_y$. Likewise, the model used for air density has been simplified down to:
+
+$$\rho  =1.2250 \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\right]}
+
+ 
