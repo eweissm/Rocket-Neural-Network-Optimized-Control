@@ -29,3 +29,9 @@ Constraints:
 $$ -5 \leq \alpha \leq 5 $$
 
 $$ -10^{\circ} \leq \Delta\theta \leq 10^{\circ} $$
+
+$$ d_y \geq 0 $$
+
+$$ t \leq T_{max} $$
+
+Target: at $t = T_{max},\ X = [0, 0, 0 ,0 ,0]^T $
