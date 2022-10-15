@@ -1,14 +1,17 @@
 # Project 1
+### State: 
 
 The current state, X, The cket is made of the  location of the rocket in relation to the target landing site, the current velocity of the rocket, and the rocket's angle.
+ 
+$$X = [d_x, d_y, v_x, v_y, \theta]^T$$
 
-State: $X = [d_x, d_y, v_x, v_y, \theta]^T$
 
+### Input: 
 The input, a, of the rocket consists of the acceleration, $\alpha$, which is in the direction the nose of the rocket is pointing, and the change in angle of the rocket.
 
-Input: $a= [\alpha, \Delta \theta]$
+$$a= [\alpha, \Delta \theta]$$
 
-Dynamics:
+### Dynamics:
 
 $$d_x(t+1) = d_x(t)+Vx(t)*\Delta t - \frac{1}{2}*\Delta t^2 \alpha sin(\theta)$$
 
@@ -24,7 +27,7 @@ The model of drag used in this problem is vastly simplified and will be soley a 
 
 $$\rho  =\rho _{b}\exp \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\right] =1.2250 *\exp{\left[{\frac {-9.81 * .0289644\left(d_y\right)}{8.3145^{*}(288.15)}}\right]} = 1.2250 *\exp{[-1.186 * 10^{-4}* d_y]}$$
 
-Constraints:
+### Constraints:
 
 $$ -5 \leq \alpha \leq 5 $$
 
@@ -34,4 +37,8 @@ $$ d_y \geq 0 $$
 
 $$ t \leq T_{max} $$
 
-Target: at $t = T_{max},\ X = [0, 0, 0 ,0 ,0]^T $
+### Target: at $t = T_{max},\ X = [0, 0, 0 ,0 ,0]^T $
+
+### Controller:
+
+We will use a contoller $\pi_\phi$, where $\phi$ are the design variables and $\pi$ is a neural network which takes the state Xhe input and returns the output
