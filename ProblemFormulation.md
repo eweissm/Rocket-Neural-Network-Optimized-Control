@@ -29,9 +29,9 @@ $$\rho  =\rho _{b}\exp \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\r
 
 ### Constraints:
 
-$$ -5 \leq \alpha \leq 5 $$
+$$ -\alpha_{max} \leq \alpha \leq \alpha_{max} $$
 
-$$ -10^{\circ} \leq \Delta\theta \leq 10^{\circ} $$
+$$ -\Delta\theta_{max} ^{\circ} \leq \Delta\theta \leq \Delta\theta_{max}^{\circ} $$
 
 $$ d_y \geq 0 $$
 
@@ -41,4 +41,4 @@ $$ t \leq T_{max} $$
 
 ### Controller:
 
-We will use a contoller $\pi_\phi$, where $\phi$ are the design variables and $\pi$ is a neural network which takes the state Xhe input and returns the output
+We will use a contoller $\pi_\phi$, where $\phi$ are the design variables and $\pi$ is a neural network which takes the state X as the input and returns the output $\alpha$. The objective function will consist of two forms of reward. The first is the instantaneous reward, r, which will accumulate throught the process, and the terminal reward, c, which will be calc
