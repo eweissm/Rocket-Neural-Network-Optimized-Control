@@ -8,4 +8,10 @@ The input, a, of the rocket consists of the acceleration, $\alpha$, which is in 
 
 Input: $a= [\alpha, \Delta \theta]$
 
-Dnamics:
+Dynamics:
+
+$$d_x(t+1) = d_x(t)+Vx(t)*\Delta t - \frac{1}{2}*\Delta t^2 \alpha sin(\theta)$$
+
+$$d_y(t+1) = d_y(t)+Vy(t)*\Delta t - \frac{1}{2}*\Delta t^2 (\alpha*cos(\theta)-g)$$
+
+$$v_x(t+1) = V_x(t)- \Delta t \alpha cos(\theta)$$
