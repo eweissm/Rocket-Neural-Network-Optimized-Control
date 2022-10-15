@@ -26,6 +26,6 @@ $$\rho  =\rho _{b}\exp \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\r
 
 Constraints:
 
-$$ -5lpha \leq 5 $$
+$$ -5 \leq \alpha \leq 5 $$
 
-$$ \theta
+$$ -10^{\circ} \leq \Delta\theta \leq 10^{\circ} $$
