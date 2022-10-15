@@ -44,4 +44,4 @@ at $t = T_{max},\ X_T= [0, 0, 0 ,0 ,0]^T $
 
 We will use a contoller $\pi_\phi$, where $\phi$ are the design variables and $\pi$ is a neural network which takes the state X as the input and returns the output $\alpha$. To find the optimized pararamters we will define the error, e, as:
 
-$$ e = \|| W \dot (X(T_{max}) - X_T) \||$$
+$$ e = \|| W \cdot (X(T_{max}) - X_T) \||$$
