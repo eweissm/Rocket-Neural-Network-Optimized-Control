@@ -18,11 +18,16 @@ FRAME_TIME = 0.1  # time interval
 GRAVITY_ACCEL = 0.12  # gravity constant
 BOOST_ACCEL = 0.18  # thrust constant
 
+PLATFORM_WIDTH = 0.25  # landing platform width
+PLATFORM_HEIGHT = 0.06  # landing platform height
+ROTATION_ACCEL = 20  # rotation constant
 
-# # the following parameters are not being used in the sample code
-# PLATFORM_WIDTH = 0.25  # landing platform width
-# PLATFORM_HEIGHT = 0.06  # landing platform height
-# ROTATION_ACCEL = 20  # rotation constant
+airDensitySeaLevel = 1.2250
+terminalVel = 100  # terminal velocity at sea level
+C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
+
+airDensityConstant = -1.186*10**-4
+
 # define system dynamics
 # Notes:
 # 0. You only need to modify the "forward" function
@@ -38,9 +43,14 @@ class Dynamics(nn.Module):
     @staticmethod
     def forward(state, action):
         """
-        action: thrust or no thrust
-        state[0] = y
-        state[1] = y_dot
+
+        action[0] = thrust or no thrust
+        action[1]= deltaTheta
+        state[0] = x
+        state[1] = y
+        state[2] = x_dot
+        state[3] = y_dot
+        state[4] = theta
         """
 
         # Apply gravity
@@ -59,32 +69,6 @@ class Dynamics(nn.Module):
 
         # Update state
         # Note: Same as above. Use operators on matrices/tensors as much as possible. Do not use element-wise operators as they are considered inplace.
-        step_mat = t.tensor([[1., FRAME_TIME],
-                             [0., 1.]])
-        state = t.matmul(step_mat, state)
-
-        return state
-
-
-# Demonstrate the inplace operation issue
-
-class Dynamics(nn.Module):
-
-    def __init__(self):
-        super(Dynamics, self).__init__()
-
-    @staticmethod
-    def forward(state, action):
-        """
-        action: thrust or no thrust
-        state[0] = y
-        state[1] = y_dot
-        """
-
-        # Update velocity using element-wise operation. This leads to an error from PyTorch.
-        state[1] = state[1] + GRAVITY_ACCEL * FRAME_TIME - BOOST_ACCEL * FRAME_TIME * action
-
-        # Update state
         step_mat = t.tensor([[1., FRAME_TIME],
                              [0., 1.]])
         state = t.matmul(step_mat, state)
@@ -184,7 +168,7 @@ class Optimize:
         for epoch in range(epochs):
             loss = self.step()
             print('[%d] loss: %.3f' % (epoch + 1, loss))
-            self.visualize()
+            # self.visualize()
 
     def visualize(self):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
