@@ -37,8 +37,11 @@ $$ d_y \geq 0 $$
 
 $$ t \leq T_{max} $$
 
-### Target: at $t = T_{max},\ X = [0, 0, 0 ,0 ,0]^T $
+### Target: 
+at $t = T_{max},\ X_T= [0, 0, 0 ,0 ,0]^T $
 
 ### Controller:
 
-We will use a contoller $\pi_\phi$, where $\phi$ are the design variables and $\pi$ is a neural network which takes the state X as the input and returns the output $\alpha$. The objective function will consist of two forms of reward. The first is the instantaneous reward, r, which will accumulate throught the process, and the terminal reward, c, which will be calc
+We will use a contoller $\pi_\phi$, where $\phi$ are the design variables and $\pi$ is a neural network which takes the state X as the input and returns the output $\alpha$. To find the optimized pararamters we will define the error, e, as:
+
+$$ e = \|| W \dot (X(T_{max}) - X_T) \||$$
