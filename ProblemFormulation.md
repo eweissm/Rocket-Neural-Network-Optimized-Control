@@ -24,4 +24,8 @@ The model of drag used in this problem is vastly simplified and will be soley a 
 
 $$\rho  =\rho _{b}\exp \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\right] =1.2250 *\exp{\left[{\frac {-9.81 * .0289644\left(d_y\right)}{8.3145^{*}(288.15)}}\right]} = 1.2250 *\exp{[-1.186 * 10^{-4}* d_y]}$$
 
- 
+Constraints:
+
+$$ -5lpha \leq 5 $$
+
+$$ \theta
