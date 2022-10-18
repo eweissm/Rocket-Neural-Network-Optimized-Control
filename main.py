@@ -60,11 +60,11 @@ class Dynamics(nn.Module):
         # Thrust
         # Note: Same reason as above. Need a 5-by-1 tensor.
         N = len(state)
-        state_tensor = t.zeros((N))
+        state_tensor = t.zeros(N)
 
-        state_tensor[1] = -t.sin(state[4])
+        state_tensor[1] = -t.sin(state[4]) - C_d*airDensitySeaLevel * t.mul(t.exp(state[2]), t.mul(state[1],state[1] ))
 
-        state_tensor[3] = t.cos(state[4])
+        state_tensor[3] = t.cos(state[4]) + C_d*airDensitySeaLevel * t.mul(t.exp(state[2]), t.mul(state[3],state[3] ))
 
         delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[0])
         # Theta
