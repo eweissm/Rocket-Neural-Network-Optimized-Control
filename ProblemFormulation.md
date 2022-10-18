@@ -3,7 +3,7 @@
 
 The current state, X, The cket is made of the  location of the rocket in relation to the target landing site, the current velocity of the rocket, and the rocket's angle.
  
-$$X = [d_x, d_y, v_x, v_y, \theta]^T$$
+$$X = [d_x, v_x, d_y, v_y, \theta]^T$$
 
 
 ### Input: 
