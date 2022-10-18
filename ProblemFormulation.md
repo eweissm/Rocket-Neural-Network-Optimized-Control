@@ -15,13 +15,13 @@ $$a= [\alpha, \Delta \theta]$$
 
 $$d_x(t+1) = d_x(t)+Vx(t)*\Delta t - \frac{1}{2}*\Delta t^2 (\alpha sin(\theta) + C_d \rho v_x(t)^2 )$$
 
-$$d_y(t+1) = d_y(t)+Vy(t)*\Delta t + \frac{1}{2}*\Delta t^2 (\alpha*cos(\theta)-g + C_d \rho v_y(t)^2)$$
+$$v_x(t+1) = v_x(t)- \Delta t (\alpha sin(\theta) + C_d \rho v_x(t)^2) $$
 
-$$v_x(t+1) = v_x(t)- \Delta t (\alpha sin(\theta) - C_d \rho v_x(t)^2) $$
+$$d_y(t+1) = d_y(t)+Vy(t)*\Delta t + \frac{1}{2}*\Delta t^2 (\alpha*cos(\theta)-g + C_d \rho v_y(t)^2)$$
 
 $$v_y(t+1) = v_y(t)+ \Delta t (\alpha cos(\theta)+ C_d \rho v_y(t)^2 - g)$$
 
-$$\theta (t+1) = \theta (t) + \Delta \theta$$
+$$\theta (t+1) = \theta (t) - \Delta \theta \Delta t$$
 
 The model of drag used in this problem is vastly simplified and will be soley a function of the airspeed, the air desity and a constant, where $C_d$ is the coeffifient of drag and $rho$ is the air density as a function of $d_y$. Likewise, the model used for air density has been simplified down to:
 
