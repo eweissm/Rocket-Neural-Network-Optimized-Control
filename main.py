@@ -60,12 +60,15 @@ class Dynamics(nn.Module):
         # Thrust
         # Note: Same reason as above. Need a 5-by-1 tensor.
         N = len(state)
-        state_tensor = t.zeros((N, 5))
-        state_tensor[:, 1] = -t.sin(state[:, 4])
-        state_tensor[:, 3] = t.cos(state[:, 4])
-        delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
+        state_tensor = t.zeros((N))
+
+        state_tensor[1] = -t.sin(state[4])
+
+        state_tensor[3] = t.cos(state[4])
+
+        delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[0])
         # Theta
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[1])
         state = state + delta_state + delta_state_gravity + delta_state_theta
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
@@ -139,8 +142,8 @@ class Simulation(nn.Module):
         return t.tensor(state, requires_grad=False).float()
 
     def error(self, state):
-        return state[0] ** 2 + state[1] ** 2 + state[2] ** 2 + state[3] ** 2 + state[4] ** 2
-
+        return state[0] ** 2 + (state[1] - PLATFORM_HEIGHT) ** 2 + state[2] ** 2 + state[3] ** 2 + state[4] ** 2
+# TODO: Maybe more advanced loss eq
 
 # set up the optimizer
 # Note:
