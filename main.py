@@ -144,7 +144,7 @@ class Simulation(nn.Module):
         return t.tensor(state, requires_grad=False).float()
 
     def error(self, state):
-        return (W[0] * state[0]) ** 2 + (W[1] * (state[1] - PLATFORM_HEIGHT)) ** 2 + (W[2] * state[2]) ** 2 + (W[3] * state[3]) ** 2 + (W[4] * state[4]) ** 2
+        return (W[0] * state[0]) ** 2 + (W[1] * state[1]) ** 2 + (W[2] * (state[2] - PLATFORM_HEIGHT)) ** 2 + (W[3] * state[3]) ** 2 + (W[4] * state[4]) ** 2
 # TODO: Maybe more advanced loss eq
 
 # set up the optimizer
