@@ -3,7 +3,7 @@
 
 The current state, X, The cket is made of the  location of the rocket in relation to the target landing site, the current velocity of the rocket, and the rocket's angle.
  
-$$X = [d_x, d_y, v_x, v_y, \theta]^T$$
+$$X = [d_x, v_x, d_y, v_y, \theta]^T$$
 
 
 ### Input: 
@@ -38,7 +38,7 @@ $$ d_y \geq 0 $$
 $$ t \leq T_{max} $$
 
 ### Target: 
-at $t = T_{max},\ X_T= [0, 0, 0 ,0 ,0]^T $
+at $t = T_{max},\ X_T= [0, Height\ of\ the\ Landing\ Pad, 0 ,0 ,0]^T $
 
 ### Controller:
 
