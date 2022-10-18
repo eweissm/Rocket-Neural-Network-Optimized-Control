@@ -28,6 +28,8 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-4
 
+W = [1., 1., 1., 1., 1.]
+
 # define system dynamics
 # Notes:
 # 0. You only need to modify the "forward" function
@@ -142,7 +144,7 @@ class Simulation(nn.Module):
         return t.tensor(state, requires_grad=False).float()
 
     def error(self, state):
-        return state[0] ** 2 + (state[1] - PLATFORM_HEIGHT) ** 2 + state[2] ** 2 + state[3] ** 2 + state[4] ** 2
+        return (W[0] * state[0]) ** 2 + (W[1] * (state[1] - PLATFORM_HEIGHT)) ** 2 + (W[2] * state[2]) ** 2 + (W[3] * state[3]) ** 2 + (W[4] * state[4]) ** 2
 # TODO: Maybe more advanced loss eq
 
 # set up the optimizer
@@ -194,3 +196,4 @@ c = Controller(dim_input, dim_hidden, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
 o.train(40)  # solve the optimization problem
+# TODO: Why is loss capped at 1?
