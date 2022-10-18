@@ -43,35 +43,37 @@ class Dynamics(nn.Module):
     @staticmethod
     def forward(state, action):
         """
-
-        action[0] = thrust or no thrust
-        action[1]= deltaTheta
+        action[0] = thrust controller
+        action[1] = omega controller
         state[0] = x
-        state[1] = y
-        state[2] = x_dot
+        state[1] = x_dot
+        state[2] = y
         state[3] = y_dot
         state[4] = theta
         """
-
         # Apply gravity
         # Note: Here gravity is used to change velocity which is the second element of the state vector
         # Normally, we would do x[1] = x[1] + gravity * delta_time
         # but this is not allowed in PyTorch since it overwrites one variable (x[1]) that is part of the computational graph to be differentiated.
         # Therefore, I define a tensor dx = [0., gravity * delta_time], and do x = x + dx. This is allowed...
-        delta_state_gravity = t.tensor([0., 0., 0., GRAVITY_ACCEL * FRAME_TIME, 0.])
-
+        delta_state_gravity = t.tensor([0., 0., 0., -GRAVITY_ACCEL * FRAME_TIME, 0.])
         # Thrust
-        # Note: Same reason as above. Need a 2-by-1 tensor.
-        delta_state = BOOST_ACCEL * FRAME_TIME * t.tensor([0., -1.]) * action
-
-        # Update velocity
-        state = state + delta_state + delta_state_gravity
-
+        # Note: Same reason as above. Need a 5-by-1 tensor.
+        N = len(state)
+        state_tensor = t.zeros((N, 5))
+        state_tensor[:, 1] = -t.sin(state[:, 4])
+        state_tensor[:, 3] = t.cos(state[:, 4])
+        delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
+        # Theta
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
+        state = state + delta_state + delta_state_gravity + delta_state_theta
         # Update state
-        # Note: Same as above. Use operators on matrices/tensors as much as possible. Do not use element-wise operators as they are considered inplace.
-        step_mat = t.tensor([[1., FRAME_TIME],
-                             [0., 1.]])
-        state = t.matmul(step_mat, state)
+        step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
+                                 [0., 1., 0., 0., 0.],
+                                 [0., 0., 1., FRAME_TIME, 0.],
+                                 [0., 0., 0., 1., 0.],
+                                 [0., 0., 0., 0., 1.]])
+        state = t.matmul(step_mat, state.T)
 
         return state
 
@@ -133,11 +135,11 @@ class Simulation(nn.Module):
 
     @staticmethod
     def initialize_state():
-        state = [1., 0.]  # TODO: need batch of initial states
+        state = [1., 0., 0., 0., 0.]  # TODO: need batch of initial states
         return t.tensor(state, requires_grad=False).float()
 
     def error(self, state):
-        return state[0] ** 2 + state[1] ** 2
+        return state[0] ** 2 + state[1] ** 2 + state[2] ** 2 + state[3] ** 2 + state[4] ** 2
 
 
 # set up the optimizer
@@ -181,9 +183,9 @@ class Optimize:
 # Now it's time to run the code!
 
 T = 100  # number of time steps
-dim_input = 2  # state space dimensions
+dim_input = 5  # state space dimensions
 dim_hidden = 6  # latent dimensions
-dim_output = 1  # action space dimensions
+dim_output = 2  # action space dimensions
 d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
