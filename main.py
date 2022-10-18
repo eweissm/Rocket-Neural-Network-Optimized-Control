@@ -22,11 +22,11 @@ PLATFORM_WIDTH = 0.25  # landing platform width
 PLATFORM_HEIGHT = 0.06  # landing platform height
 ROTATION_ACCEL = 20  # rotation constant
 
-airDensitySeaLevel = 1.2250
-terminalVel = 100  # terminal velocity at sea level
+airDensitySeaLevel = .012250
+terminalVel = 1000  # terminal velocity at sea level
 C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
-airDensityConstant = -1.186*10**-4
+airDensityConstant = -1.186*10**-6
 
 W = [1., 1., 1., 1., 1.]
 
@@ -190,7 +190,7 @@ class Optimize:
 
 T = 100  # number of time steps
 dim_input = 5  # state space dimensions
-dim_hidden = 6  # latent dimensions
+dim_hidden = 10  # latent dimensions
 dim_output = 2  # action space dimensions
 d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden, dim_output)  # define controller
