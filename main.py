@@ -140,7 +140,7 @@ class Simulation(nn.Module):
 
     @staticmethod
     def initialize_state():
-        state = [1., 0., 0., 0., 0.]  # TODO: need batch of initial states
+        state = [1., 1., 1., 1., 1.]  # TODO: need batch of initial states
         return t.tensor(state, requires_grad=False).float()
 
     def error(self, state):
@@ -175,6 +175,7 @@ class Optimize:
         for epoch in range(epochs):
             loss = self.step()
             print('[%d] loss: %.3f' % (epoch + 1, loss))
+            print(np.array([self.simulation.state_trajectory[T-1].detach().numpy() ]))
             # self.visualize()
 
     def visualize(self):
