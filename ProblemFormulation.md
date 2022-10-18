@@ -17,7 +17,7 @@ $$d_x(t+1) = d_x(t)+Vx(t)*\Delta t - \frac{1}{2}*\Delta t^2 (\alpha sin(\theta) 
 
 $$d_y(t+1) = d_y(t)+Vy(t)*\Delta t + \frac{1}{2}*\Delta t^2 (\alpha*cos(\theta)-g + C_d \rho v_y(t)^2)$$
 
-$$v_x(t+1) = v_x(t)- \Delta t (\alpha sin(\theta) - C_d \rho v_x(t)^2) $$
+$$v_x(t+1) = v_x(t)- \Delta t (\alpha sin(\theta) + C_d \rho v_x(t)^2) $$
 
 $$v_y(t+1) = v_y(t)+ \Delta t (\alpha cos(\theta)+ C_d \rho v_y(t)^2 - g)$$
 
