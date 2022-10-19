@@ -42,7 +42,7 @@ $$ d_y \geq 0 $$
 $$ t \leq T_{max} $$
 
 ### Target: 
-at $t = T_{max},\ X_T= [0, 0, 0, Height\ of\ the\ Landing\ Pad ,0]^T $
+at $t = T_{max},\ X_T= [0, 0, Height\ of\ the\ Landing\ Pad, 0, 0]^T $
 
 ### Controller:
 
