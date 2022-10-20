@@ -100,11 +100,12 @@ class Controller(nn.Module):
         dim_output: # of actions
         dim_hidden: up to you
         """
+        image = t.zeros([dim_numStartingPos, 1, dim_input])
+        print(image)
         super(Controller, self).__init__()
         self.network = nn.Sequential(
-            nn.Linear(dim_input, dim_numStartingPos),
-            nn.Tanh(),
-            nn.Linear(dim_numStartingPos, dim_hidden),
+            nn.Flatten(image),
+            nn.Linear(dim_input, dim_hidden),
             nn.Tanh(),
             nn.Linear(dim_hidden, dim_output),
             # You can add more layers here
