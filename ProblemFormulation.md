@@ -27,6 +27,10 @@ The model of drag used in this problem is vastly simplified and will be soley a 
 
 $$\rho  =\rho _{b}\exp \left[{\frac {-g_{0}M\left(h-h_{b}\right)}{R^{*}T_{b}}}\right] =1.2250 *\exp{\left[{\frac {-9.81 * .0289644\left(d_y\right)}{8.3145^{*}(288.15)}}\right]} = 1.2250 *\exp{[-1.186 * 10^{-4}* d_y]}$$
 
+Additionally, the coefficient of drag is arbitrarily set to give a predermined terminal velocity at sea level with:
+
+$$ C_d = \frac{g}{\rho_{sea\ level} * V_{terminal}^2}$$
+
 ### Constraints:
 
 $$ -\alpha_{max} \leq \alpha \leq \alpha_{max} $$
@@ -38,7 +42,7 @@ $$ d_y \geq 0 $$
 $$ t \leq T_{max} $$
 
 ### Target: 
-at $t = T_{max},\ X_T= [0, Height\ of\ the\ Landing\ Pad, 0 ,0 ,0]^T $
+at $t = T_{max},\ X_T= [0, 0, Height\ of\ the\ Landing\ Pad, 0, 0]^T $
 
 ### Controller:
 
