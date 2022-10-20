@@ -30,6 +30,7 @@ airDensityConstant = -1.186*10**-6
 
 W = [1., 1., 1., 1., 1.]
 
+numTestStates = 30
 # define system dynamics
 # Notes:
 # 0. You only need to modify the "forward" function
@@ -62,15 +63,15 @@ class Dynamics(nn.Module):
         # Thrust
         # Note: Same reason as above. Need a 5-by-1 tensor.
         N = len(state)
-        state_tensor = t.zeros(N)
+        state_tensor = t.zeros((N, 5))
 
-        state_tensor[1] = -t.sin(state[4]) - C_d*airDensitySeaLevel * t.mul(t.exp(state[2]), t.mul(state[1], state[1]))
+        state_tensor[:, 1] = -t.sin(state[:, 4]) - C_d*airDensitySeaLevel * t.mul(t.exp(state[:, 2]), t.mul(state[:, 1], state[:, 1]))
 
-        state_tensor[3] = t.cos(state[4]) + C_d*airDensitySeaLevel * t.mul(t.exp(state[2]), t.mul(state[3], state[3]))
+        state_tensor[:, 3] = t.cos(state[:, 4]) + C_d*airDensitySeaLevel * t.mul(t.exp(state[:, 2]), t.mul(state[:, 3], state[:, 3]))
 
-        delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[0])
+        delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
         # Theta
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[1])
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, 1.]), action[:, 1].reshape(-1, 1))
         state = state + delta_state + delta_state_gravity + delta_state_theta
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
@@ -140,8 +141,20 @@ class Simulation(nn.Module):
 
     @staticmethod
     def initialize_state():
-        state = [1., 1., 1., 1., 1.]  # TODO: need batch of initial states
-        return t.tensor(state, requires_grad=False).float()
+        states = t.zeros( numTestStates, 5)
+
+        for i in range(0,numTestStates ):
+            states[i][0] = random.uniform(-10, 10)
+            states[i][1] = random.uniform(-10, 10)
+            states[i][2] = random.uniform(0, 10)
+            states[i][3] = random.uniform(-10, 10)
+            states[i][4] = random.uniform(-20, 20)
+
+
+        print(states)
+
+        #state = [1., 1., 1., 1., 1.]  # TODO: need batch of initial states
+        return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
         return (W[0] * state[0]) ** 2 + (W[1] * state[1]) ** 2 + (W[2] * (state[2] - PLATFORM_HEIGHT)) ** 2 + (W[3] * state[3]) ** 2 + (W[4] * state[4]) ** 2
