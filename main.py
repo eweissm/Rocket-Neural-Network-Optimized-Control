@@ -71,7 +71,9 @@ class Dynamics(nn.Module):
 
         delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
         # Theta
+
         delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
+
         state = state + delta_state + delta_state_gravity + delta_state_theta
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
@@ -79,10 +81,10 @@ class Dynamics(nn.Module):
                                  [0., 0., 1., FRAME_TIME, 0.],
                                  [0., 0., 0., 1., 0.],
                                  [0., 0., 0., 0., 1.]])
-        print(state)
+
         state = t.matmul(step_mat, state.T)
 
-        return state
+        return state.T
 
 
 # a deterministic controller
@@ -94,7 +96,7 @@ class Dynamics(nn.Module):
 
 class Controller(nn.Module):
 
-    def __init__(self, dim_input, dim_hidden, dim_output, dim_numStartingPos):
+    def __init__(self, dim_input, dim_hidden, dim_output):
         """
         dim_input: # of system states
         dim_output: # of actions
@@ -103,9 +105,7 @@ class Controller(nn.Module):
 
         super(Controller, self).__init__()
         self.network = nn.Sequential(
-            nn.Linear(dim_input, dim_numStartingPos),
-            nn.Tanh(),
-            nn.Linear(dim_numStartingPos, dim_hidden),
+            nn.Linear(dim_input, dim_hidden),
             nn.Tanh(),
             nn.Linear(dim_hidden, dim_output),
             # You can add more layers here
@@ -205,9 +205,8 @@ T = 100  # number of time steps
 dim_input = 5  # state space dimensions
 dim_hidden = 8  # latent dimensions
 dim_output = 2  # action space dimensions
-dim_numStartingPos = numTestStates
 d = Dynamics()  # define dynamics
-c = Controller(dim_input, dim_hidden, dim_output, dim_numStartingPos)  # define controller
+c = Controller(dim_input, dim_hidden, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
 o.train(40)  # solve the optimization problem
