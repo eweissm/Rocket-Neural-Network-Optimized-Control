@@ -71,7 +71,7 @@ class Dynamics(nn.Module):
 
         delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
         # Theta
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, 1.]), action[:, 1].reshape(-1, 1))
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
         state = state + delta_state + delta_state_gravity + delta_state_theta
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
@@ -79,6 +79,7 @@ class Dynamics(nn.Module):
                                  [0., 0., 1., FRAME_TIME, 0.],
                                  [0., 0., 0., 1., 0.],
                                  [0., 0., 0., 0., 1.]])
+
         state = t.matmul(step_mat, state.T)
 
         return state
@@ -93,7 +94,7 @@ class Dynamics(nn.Module):
 
 class Controller(nn.Module):
 
-    def __init__(self, dim_input, dim_hidden, dim_output):
+    def __init__(self, dim_input, dim_hidden, dim_output, dim_numStartingPos):
         """
         dim_input: # of system states
         dim_output: # of actions
@@ -101,7 +102,9 @@ class Controller(nn.Module):
         """
         super(Controller, self).__init__()
         self.network = nn.Sequential(
-            nn.Linear(dim_input, dim_hidden),
+            nn.Linear(dim_input, dim_numStartingPos),
+            nn.Tanh(),
+            nn.Linear(dim_numStartingPos, dim_hidden),
             nn.Tanh(),
             nn.Linear(dim_hidden, dim_output),
             # You can add more layers here
@@ -141,23 +144,19 @@ class Simulation(nn.Module):
 
     @staticmethod
     def initialize_state():
-        states = t.zeros( numTestStates, 5)
+        states = t.zeros(numTestStates, 5)
 
-        for i in range(0,numTestStates ):
+        for i in range(0, numTestStates):
             states[i][0] = random.uniform(-10, 10)
             states[i][1] = random.uniform(-10, 10)
             states[i][2] = random.uniform(0, 10)
             states[i][3] = random.uniform(-10, 10)
             states[i][4] = random.uniform(-20, 20)
 
-
-        print(states)
-
-        #state = [1., 1., 1., 1., 1.]  # TODO: need batch of initial states
         return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
-        return (W[0] * state[0]) ** 2 + (W[1] * state[1]) ** 2 + (W[2] * (state[2] - PLATFORM_HEIGHT)) ** 2 + (W[3] * state[3]) ** 2 + (W[4] * state[4]) ** 2
+        return (W[0] * state[:, 0]) ** 2 + (W[1] * state[:, 1]) ** 2 + (W[2] * (state[:, 2] - PLATFORM_HEIGHT)) ** 2 + (W[3] * state[:, 3]) ** 2 + (W[4] * state[:, 4]) ** 2
 # TODO: Maybe more advanced loss eq
 
 # set up the optimizer
@@ -203,11 +202,11 @@ class Optimize:
 
 T = 100  # number of time steps
 dim_input = 5  # state space dimensions
-dim_hidden = 10  # latent dimensions
+dim_hidden = 8  # latent dimensions
 dim_output = 2  # action space dimensions
+dim_numStartingPos = numTestStates
 d = Dynamics()  # define dynamics
-c = Controller(dim_input, dim_hidden, dim_output)  # define controller
+c = Controller(dim_input, dim_hidden, dim_output, dim_numStartingPos)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
 o.train(40)  # solve the optimization problem
-# TODO: Why is loss capped at 1?
