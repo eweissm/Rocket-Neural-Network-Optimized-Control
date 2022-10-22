@@ -31,6 +31,8 @@ airDensityConstant = -1.186*10**-6
 W = [1., 1., 1., 1., 1.]
 
 numTestStates = 30
+
+# TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation
 # define system dynamics
 # Notes:
 # 0. You only need to modify the "forward" function
@@ -153,12 +155,12 @@ class Simulation(nn.Module):
             states[i][2] = random.uniform(0, 10)
             states[i][3] = random.uniform(-10, 10)
             states[i][4] = random.uniform(-20, 20)
-
+        print(states)
         return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
         errorCumulative = (W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2 + W[4] * state[:, 4] ** 2)
-
+        print(errorCumulative)
 
         return errorCumulative
 
@@ -178,9 +180,10 @@ class Optimize:
 
     def step(self):
         def closure():
+            v = t.ones(numTestStates)
             loss = self.simulation(self.simulation.state)
             self.optimizer.zero_grad()
-            loss.backward()
+            loss.backward(v)
             return loss
 
         self.optimizer.step(closure)
