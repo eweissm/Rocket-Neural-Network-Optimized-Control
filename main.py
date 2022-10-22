@@ -74,7 +74,8 @@ class Dynamics(nn.Module):
         delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
         # Theta
 
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, 1.]), action[:, 1].reshape(-1, 1))
+        #should 1 be neg???^^^^
 
         state = state + delta_state + delta_state_gravity + delta_state_theta
         # Update state
@@ -147,14 +148,14 @@ class Simulation(nn.Module):
 
     @staticmethod
     def initialize_state():
-        states = t.zeros(numTestStates, 5)
+        states = t.ones(numTestStates, 5)
 
-        for i in range(0, numTestStates):
-            states[i][0] = random.uniform(-10, 10)
-            states[i][1] = random.uniform(-10, 10)
-            states[i][2] = random.uniform(0, 10)
-            states[i][3] = random.uniform(-10, 10)
-            states[i][4] = random.uniform(-20, 20)
+        # for i in range(0, numTestStates):
+        #     states[i][0] = random.uniform(-10, 10)
+        #     states[i][1] = random.uniform(-10, 10)
+        #     states[i][2] = random.uniform(0, 10)
+        #     states[i][3] = random.uniform(-10, 10)
+        #     states[i][4] = random.uniform(-20, 20)
         print(states)
         return t.tensor(states, requires_grad=False).float()
 
@@ -180,10 +181,10 @@ class Optimize:
 
     def step(self):
         def closure():
-            v = t.ones(numTestStates)
             loss = self.simulation(self.simulation.state)
             self.optimizer.zero_grad()
-            loss.backward(v)
+            loss.T
+            loss.backward()
             return loss
 
         self.optimizer.step(closure)
@@ -199,7 +200,10 @@ class Optimize:
     def visualize(self):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
         x = data[:, 0]
-        y = data[:, 1]
+        vx = data[:, 1]
+        y = data[:, 2]
+        vy = data[:, 3]
+        ang = data[:, 4]
         plt.plot(x, y)
         plt.show()
 
