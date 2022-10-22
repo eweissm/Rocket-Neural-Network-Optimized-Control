@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 FRAME_TIME = 0.1  # time interval
 GRAVITY_ACCEL = 0.12  # gravity constant
-BOOST_ACCEL = 0.18  # thrust constant
+BOOST_ACCEL = 0.5  # thrust constant
 
 PLATFORM_WIDTH = 0.25  # landing platform width
 PLATFORM_HEIGHT = 0.06  # landing platform height
@@ -28,9 +28,9 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-6
 
-W = [1., 1., 1., 1., 1.]
+W = [6., 1., 4., 1., .1]
 
-numTestStates = 1
+numTestStates = 40
 
 # TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
 # define system dynamics
@@ -156,16 +156,16 @@ class Simulation(nn.Module):
         states = t.ones(numTestStates, 5)
 
         for i in range(0, numTestStates):
-            states[i][0] = random.uniform(-10, 10)
-            states[i][1] = random.uniform(-10, 10)
-            states[i][2] = random.uniform(0, 10)
-            states[i][3] = random.uniform(-10, 10)
+            states[i][0] = random.uniform(-1, 1)
+            states[i][1] = random.uniform(-1, 1)
+            states[i][2] = random.uniform(0, 1)
+            states[i][3] = random.uniform(-1, 1)
             states[i][4] = random.uniform(-20, 20)
         print(states)
         return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
-        errorCumulative = (W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2 + W[4] * state[:, 4] ** 2)
+        errorCumulative = sum(W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2 + W[4] * state[:, 4] ** 2)
         #print(errorCumulative)
 
         return errorCumulative
@@ -199,7 +199,7 @@ class Optimize:
             loss = self.step()
             print('[%d] loss: %.3f' % (epoch + 1, loss))
             print(np.array([self.simulation.state_trajectory[T-1].detach().numpy() ]))
-            # self.visualize()
+            #self.visualize()
 
     def visualize(self):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
@@ -216,7 +216,7 @@ class Optimize:
 
 T = 100  # number of time steps
 dim_input = 5  # state space dimensions
-dim_hidden = 8  # latent dimensions
+dim_hidden = 10  # latent dimensions
 dim_output = 2  # action space dimensions
 d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden, dim_output)  # define controller
