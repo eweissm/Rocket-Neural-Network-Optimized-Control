@@ -71,7 +71,7 @@ class Dynamics(nn.Module):
 
         state_tensor[:, 3] = t.cos(state[:, 4])
 
-        delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
+        delta_state_acc = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
         # Theta
         state_tensor_drag = t.zeros((N, 5))
         state_tensor_drag[:, 1] = - C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 1], state[:, 1]))
@@ -79,10 +79,10 @@ class Dynamics(nn.Module):
         state_tensor_drag[:, 3] = C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 3], state[:, 3]))
         delta_state_drag = FRAME_TIME * state_tensor_drag
 
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, 1.]), action[:, 1].reshape(-1, 1))
         #should 1 be neg???^^^^
 
-        state = state + delta_state + delta_state_gravity + delta_state_theta + delta_state_drag
+        state = state + delta_state_acc + delta_state_gravity + delta_state_theta + delta_state_drag
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
                                  [0., 1., 0., 0., 0.],
