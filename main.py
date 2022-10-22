@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 FRAME_TIME = 0.1  # time interval
 GRAVITY_ACCEL = 0.12  # gravity constant
-BOOST_ACCEL = 0.5  # thrust constant
+BOOST_ACCEL = 0.18  # thrust constant
 
 PLATFORM_WIDTH = 0.25  # landing platform width
 PLATFORM_HEIGHT = 0.06  # landing platform height
@@ -28,9 +28,9 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-6
 
-W = [6., 1., 4., 1., .1]
+W = [8., 2., 5., 3., .05]
 
-numTestStates = 40
+numTestStates = 100
 
 # TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
 # define system dynamics
@@ -79,7 +79,7 @@ class Dynamics(nn.Module):
         state_tensor_drag[:, 3] = C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 3], state[:, 3]))
         delta_state_drag = FRAME_TIME * state_tensor_drag
 
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, 1.]), action[:, 1].reshape(-1, 1))
+        delta_state_theta = FRAME_TIME*ROTATION_ACCEL * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
         #should 1 be neg???^^^^
 
         state = state + delta_state_acc + delta_state_gravity + delta_state_theta + delta_state_drag
@@ -160,7 +160,7 @@ class Simulation(nn.Module):
             states[i][1] = random.uniform(-1, 1)
             states[i][2] = random.uniform(0, 1)
             states[i][3] = random.uniform(-1, 1)
-            states[i][4] = random.uniform(-20, 20)
+            states[i][4] = random.uniform(-1, 1)
         print(states)
         return t.tensor(states, requires_grad=False).float()
 
@@ -197,8 +197,16 @@ class Optimize:
     def train(self, epochs):
         for epoch in range(epochs):
             loss = self.step()
-            print('[%d] loss: %.3f' % (epoch + 1, loss))
-            print(np.array([self.simulation.state_trajectory[T-1].detach().numpy() ]))
+            print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss/numTestStates))
+            StateSpace=np.array([self.simulation.state_trajectory[T-1].detach().numpy() ])
+            avgSS =np.zeros(5)
+            avgSS[0] = np.mean(StateSpace[:, 0])
+            avgSS[1] = np.mean(StateSpace[:, 1])
+            avgSS[2] = np.mean(StateSpace[:, 2])
+            avgSS[3] = np.mean(StateSpace[:, 3])
+            avgSS[4] = np.mean(StateSpace[:, 4])
+            print(avgSS)
+
             #self.visualize()
 
     def visualize(self):
@@ -214,7 +222,7 @@ class Optimize:
 
 # Now it's time to run the code!
 
-T = 100  # number of time steps
+T = 20  # number of time steps
 dim_input = 5  # state space dimensions
 dim_hidden = 10  # latent dimensions
 dim_output = 2  # action space dimensions
@@ -222,4 +230,4 @@ d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
-o.train(40)  # solve the optimization problem
+o.train(80)  # solve the optimization problem
