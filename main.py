@@ -19,7 +19,7 @@ GRAVITY_ACCEL = 0.12  # gravity constant
 BOOST_ACCEL = 0.18  # thrust constant
 
 PLATFORM_WIDTH = 0.25  # landing platform width
-PLATFORM_HEIGHT = 0.06  # landing platform height
+PLATFORM_HEIGHT = 0.6  # landing platform height
 ROTATION_ACCEL = 20  # rotation constant
 
 airDensitySeaLevel = .012250
