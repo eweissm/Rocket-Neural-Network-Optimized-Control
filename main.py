@@ -30,9 +30,9 @@ airDensityConstant = -1.186*10**-6
 
 W = [1., 1., 1., 1., 1.]
 
-numTestStates = 30
+numTestStates = 1
 
-# TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation
+# TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
 # define system dynamics
 # Notes:
 # 0. You only need to modify the "forward" function
@@ -67,17 +67,22 @@ class Dynamics(nn.Module):
         N = len(state)
         state_tensor = t.zeros((N, 5))
 
-        state_tensor[:, 1] = -t.sin(state[:, 4]) - C_d*airDensitySeaLevel * t.mul(t.exp(state[:, 2]), t.mul(state[:, 1], state[:, 1]))
+        state_tensor[:, 1] = -t.sin(state[:, 4])
 
-        state_tensor[:, 3] = t.cos(state[:, 4]) + C_d*airDensitySeaLevel * t.mul(t.exp(state[:, 2]), t.mul(state[:, 3], state[:, 3]))
+        state_tensor[:, 3] = t.cos(state[:, 4])
 
         delta_state = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
         # Theta
+        state_tensor_drag = t.zeros((N, 5))
+        state_tensor_drag[:, 1] = - C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 1], state[:, 1]))
 
-        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, 1.]), action[:, 1].reshape(-1, 1))
+        state_tensor_drag[:, 3] = C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 3], state[:, 3]))
+        delta_state_drag = FRAME_TIME * state_tensor_drag
+
+        delta_state_theta = FRAME_TIME * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
         #should 1 be neg???^^^^
 
-        state = state + delta_state + delta_state_gravity + delta_state_theta
+        state = state + delta_state + delta_state_gravity + delta_state_theta + delta_state_drag
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
                                  [0., 1., 0., 0., 0.],
@@ -150,18 +155,18 @@ class Simulation(nn.Module):
     def initialize_state():
         states = t.ones(numTestStates, 5)
 
-        # for i in range(0, numTestStates):
-        #     states[i][0] = random.uniform(-10, 10)
-        #     states[i][1] = random.uniform(-10, 10)
-        #     states[i][2] = random.uniform(0, 10)
-        #     states[i][3] = random.uniform(-10, 10)
-        #     states[i][4] = random.uniform(-20, 20)
+        for i in range(0, numTestStates):
+            states[i][0] = random.uniform(-10, 10)
+            states[i][1] = random.uniform(-10, 10)
+            states[i][2] = random.uniform(0, 10)
+            states[i][3] = random.uniform(-10, 10)
+            states[i][4] = random.uniform(-20, 20)
         print(states)
         return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
         errorCumulative = (W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2 + W[4] * state[:, 4] ** 2)
-        print(errorCumulative)
+        #print(errorCumulative)
 
         return errorCumulative
 
@@ -183,7 +188,6 @@ class Optimize:
         def closure():
             loss = self.simulation(self.simulation.state)
             self.optimizer.zero_grad()
-            loss.T
             loss.backward()
             return loss
 
