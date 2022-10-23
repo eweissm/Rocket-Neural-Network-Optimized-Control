@@ -214,13 +214,13 @@ class Optimize:
 
             combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
 
-        print(combAvgSS.shape)
+
         epochNum = np.linspace(1, epochs, epochs)
         stateNames = ["X", "V_X", "Y", "V_Y", "angle"]
         fig, ax = plt.subplots(figsize=(18, 10))
         im = ax.imshow(combAvgSS.T)
 
-        cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn",orientation = "horizontal")
+        cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn", orientation = "horizontal")
 
 
         # Show all ticks and label them with the respective list entries
