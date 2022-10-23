@@ -158,11 +158,11 @@ class Simulation(nn.Module):
         states = t.ones(numTestStates, 5)
 
         for i in range(0, numTestStates):
-            states[i][0] = random.uniform(-1, 1)
-            states[i][1] = random.uniform(-1, 1)
+            states[i][0] = random.uniform(0, 1)
+            states[i][1] = random.uniform(0, 1)
             states[i][2] = random.uniform(0, 1)
-            states[i][3] = random.uniform(-1, 1)
-            states[i][4] = random.uniform(-1, 1)
+            states[i][3] = random.uniform(0, 1)
+            states[i][4] = random.uniform(0, 1)
         print(states)
         return t.tensor(states, requires_grad=False).float()
 
@@ -197,26 +197,26 @@ class Optimize:
         return closure()
 
 
-    def train(self, epochs):
-        j=0
-        fig, axs = plt.subplots(numOfEpochs)
+    def train(self, epochs,T):
+
+
         combAvgSS = np.empty((0, 5), float)
         for epoch in range(epochs):
             loss = self.step()
             print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss/numTestStates))
             StateSpace=np.array([self.simulation.state_trajectory[T-1].detach().numpy() ])
+            print(StateSpace.shape)
             avgSS =np.zeros([1, 5])
-            avgSS[0, 0] = np.mean(StateSpace[:, 0])
-            avgSS[0, 1] = np.mean(StateSpace[:, 1])
-            avgSS[0, 2] = np.mean(StateSpace[:, 2])
-            avgSS[0, 3] = np.mean(StateSpace[:, 3])
-            avgSS[0, 4] = np.mean(StateSpace[:, 4])
+            avgSS[0, 0] = np.mean(StateSpace[:,:, 0])
+            avgSS[0, 1] = np.mean(StateSpace[:,:, 1])
+            avgSS[0, 2] = np.mean(StateSpace[:,:, 2])
+            avgSS[0, 3] = np.mean(StateSpace[:,:, 3])
+            avgSS[0, 4] = np.mean(StateSpace[:,:, 4])
             print(avgSS)
 
 
             combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
-            self.visualize(j, axs)
-            j = j+1
+            self.visualize(T, epoch)
 
         epochNum = np.linspace(1, epochs, epochs)
         stateNames = ["X", "V_X", "Y", "V_Y", "angle"]
@@ -241,20 +241,20 @@ class Optimize:
         plt.show()
 
 
-    def visualize(self, j, axs):
+    def visualize(self,T, Epoch):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
 
-        x = data[:, 0]
-        print(x.shape)
+        x = data[T-1,:, 0]
         vx = data[:, 1]
-        y = data[:, 2]
+        y = data[T-1,:, 2]
         vy = data[:, 3]
         ang = data[:, 4]
-        axs[j].plot(x, y)
-        axs[j].set_title(j)
-
-        if j == numOfEpochs:
-            axs.show()
+        plt.plot(x, y, 'k.')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title(Epoch)
+        plt.plot((0), 'r.')
+        plt.show()
 
 
 # Now it's time to run the code!
@@ -267,4 +267,4 @@ d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
-o.train(numOfEpochs)  # solve the optimization problem
+o.train(numOfEpochs,T)  # solve the optimization problem
