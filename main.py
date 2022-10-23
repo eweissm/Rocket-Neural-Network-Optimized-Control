@@ -32,6 +32,8 @@ W = [8., 2., 5., 3., .05]
 
 numTestStates = 100
 
+
+
 # TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
 # define system dynamics
 # Notes:
@@ -194,19 +196,46 @@ class Optimize:
         self.optimizer.step(closure)
         return closure()
 
+
     def train(self, epochs):
+        combAvgSS = np.empty((0, 5), float)
         for epoch in range(epochs):
             loss = self.step()
             print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss/numTestStates))
             StateSpace=np.array([self.simulation.state_trajectory[T-1].detach().numpy() ])
-            avgSS =np.zeros(5)
-            avgSS[0] = np.mean(StateSpace[:, 0])
-            avgSS[1] = np.mean(StateSpace[:, 1])
-            avgSS[2] = np.mean(StateSpace[:, 2])
-            avgSS[3] = np.mean(StateSpace[:, 3])
-            avgSS[4] = np.mean(StateSpace[:, 4])
+            avgSS =np.zeros([1, 5])
+            avgSS[0, 0] = np.mean(StateSpace[:, 0])
+            avgSS[0, 1] = np.mean(StateSpace[:, 1])
+            avgSS[0, 2] = np.mean(StateSpace[:, 2])
+            avgSS[0, 3] = np.mean(StateSpace[:, 3])
+            avgSS[0, 4] = np.mean(StateSpace[:, 4])
             print(avgSS)
 
+
+            combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
+
+        print(combAvgSS.shape)
+        epochNum = np.linspace(1, epochs, epochs)
+        stateNames = ["X", "V_X", "Y", "V_Y", "angle"]
+        fig, ax = plt.subplots(figsize=(18, 10))
+        im = ax.imshow(combAvgSS.T)
+
+        cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn",orientation = "horizontal")
+
+
+        # Show all ticks and label them with the respective list entries
+        ax.set_xticks(np.arange(len(epochNum)), labels=epochNum)
+        ax.set_yticks(np.arange(len(stateNames)), labels=stateNames)
+
+        #Rotate the tick labels and set their alignment.
+        plt.setp(ax.get_xticklabels(), rotation=90, ha="right",rotation_mode="anchor")
+
+        # for i in range(len(stateNames)):
+        #     for j in range(len(epochNum)):
+        #         text = ax.text(j,i, combAvgSS.T[i, j], ha="center", va="center", color="w", fontsize="x-small")
+
+        ax.set_title("State Space Per Generation")
+        plt.show()
             #self.visualize()
 
     def visualize(self):
