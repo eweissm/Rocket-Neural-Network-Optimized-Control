@@ -240,13 +240,15 @@ class Optimize:
 
     def visualize(self):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
+
         x = data[:, 0]
+        print(x.shape)
         vx = data[:, 1]
         y = data[:, 2]
         vy = data[:, 3]
         ang = data[:, 4]
-        plt.plot(x, y)
-        plt.show()
+        # plt.plot(x, y)
+        # plt.show()
 
 
 # Now it's time to run the code!
