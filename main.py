@@ -31,7 +31,7 @@ airDensityConstant = -1.186*10**-6
 W = [8., 2., 5., 3., .05]
 
 numTestStates = 100
-
+numOfEpochs = 10
 
 
 # TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
@@ -198,6 +198,8 @@ class Optimize:
 
 
     def train(self, epochs):
+        j=0
+        fig, axs = plt.subplots(numOfEpochs)
         combAvgSS = np.empty((0, 5), float)
         for epoch in range(epochs):
             loss = self.step()
@@ -213,7 +215,8 @@ class Optimize:
 
 
             combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
-            self.visualize()
+            self.visualize(j, axs)
+            j = j+1
 
         epochNum = np.linspace(1, epochs, epochs)
         stateNames = ["X", "V_X", "Y", "V_Y", "angle"]
@@ -238,7 +241,7 @@ class Optimize:
         plt.show()
 
 
-    def visualize(self):
+    def visualize(self, j, axs):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
 
         x = data[:, 0]
@@ -247,8 +250,11 @@ class Optimize:
         y = data[:, 2]
         vy = data[:, 3]
         ang = data[:, 4]
-        # plt.plot(x, y)
-        # plt.show()
+        axs[j].plot(x, y)
+        axs[j].set_title(j)
+
+        if j == numOfEpochs:
+            axs.show()
 
 
 # Now it's time to run the code!
@@ -261,4 +267,4 @@ d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
-o.train(80)  # solve the optimization problem
+o.train(numOfEpochs)  # solve the optimization problem
