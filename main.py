@@ -28,10 +28,10 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-6
 
-W = [8., 2., 5., 3., .05]
+W = [1., 2., 1., 3.]
 
 numTestStates = 100
-numOfEpochs = 10
+numOfEpochs = 40
 
 
 # TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
@@ -74,6 +74,7 @@ class Dynamics(nn.Module):
         state_tensor[:, 3] = t.cos(state[:, 4])
 
         delta_state_acc = BOOST_ACCEL * FRAME_TIME * t.mul(state_tensor, action[:, 0].reshape(-1, 1))
+
         # Theta
         state_tensor_drag = t.zeros((N, 5))
         state_tensor_drag[:, 1] = - C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 1], state[:, 1]))
@@ -106,7 +107,7 @@ class Dynamics(nn.Module):
 
 class Controller(nn.Module):
 
-    def __init__(self, dim_input, dim_hidden, dim_output):
+    def __init__(self, dim_input, dim_hidden, dim_h2, dim_output):
         """
         dim_input: # of system states
         dim_output: # of actions
@@ -117,7 +118,9 @@ class Controller(nn.Module):
         self.network = nn.Sequential(
             nn.Linear(dim_input, dim_hidden),
             nn.Tanh(),
-            nn.Linear(dim_hidden, dim_output),
+            nn.Linear(dim_hidden, dim_h2),
+            nn.Tanh(),
+            nn.Linear(dim_h2, dim_output),
             # You can add more layers here
             nn.Sigmoid()
         )
@@ -167,7 +170,7 @@ class Simulation(nn.Module):
         return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
-        errorCumulative = sum(W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2 + W[4] * state[:, 4] ** 2)
+        errorCumulative = sum(W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2)
         #print(errorCumulative)
 
         return errorCumulative
@@ -200,18 +203,18 @@ class Optimize:
     def train(self, epochs,T):
 
 
-        combAvgSS = np.empty((0, 5), float)
+        combAvgSS = np.empty((0, 4), float)
         for epoch in range(epochs):
             loss = self.step()
             print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss/numTestStates))
             StateSpace=np.array([self.simulation.state_trajectory[T-1].detach().numpy() ])
-            print(StateSpace.shape)
-            avgSS =np.zeros([1, 5])
+
+            avgSS =np.zeros([1,4])
             avgSS[0, 0] = np.mean(StateSpace[:,:, 0])
             avgSS[0, 1] = np.mean(StateSpace[:,:, 1])
             avgSS[0, 2] = np.mean(StateSpace[:,:, 2])
             avgSS[0, 3] = np.mean(StateSpace[:,:, 3])
-            avgSS[0, 4] = np.mean(StateSpace[:,:, 4])
+
             print(avgSS)
 
 
@@ -219,7 +222,7 @@ class Optimize:
             self.visualize(T, epoch)
 
         epochNum = np.linspace(1, epochs, epochs)
-        stateNames = ["X", "V_X", "Y", "V_Y", "angle"]
+        stateNames = ["X", "V_X", "Y", "V_Y"]
         fig, ax = plt.subplots(figsize=(18, 10))
         im = ax.imshow(combAvgSS.T)
 
@@ -248,23 +251,24 @@ class Optimize:
         vx = data[:, 1]
         y = data[T-1,:, 2]
         vy = data[:, 3]
-        ang = data[:, 4]
+
         plt.plot(x, y, 'k.')
         plt.xlabel('X')
         plt.ylabel('Y')
-        plt.title(Epoch)
+        plt.title(Epoch+1)
         plt.plot((0), 'r.')
-        plt.show()
+        #plt.show()
 
 
 # Now it's time to run the code!
 
-T = 20  # number of time steps
+T = 100  # number of time steps
 dim_input = 5  # state space dimensions
-dim_hidden = 10  # latent dimensions
+dim_hidden = 8  # latent dimensions
+dim_h2 = 10
 dim_output = 2  # action space dimensions
 d = Dynamics()  # define dynamics
-c = Controller(dim_input, dim_hidden, dim_output)  # define controller
+c = Controller(dim_input, dim_hidden,dim_h2, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
 o.train(numOfEpochs,T)  # solve the optimization problem
