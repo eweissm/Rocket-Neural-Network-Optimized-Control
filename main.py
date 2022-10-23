@@ -213,7 +213,7 @@ class Optimize:
 
 
             combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
-
+            self.visualize()
 
         epochNum = np.linspace(1, epochs, epochs)
         stateNames = ["X", "V_X", "Y", "V_Y", "angle"]
@@ -236,7 +236,7 @@ class Optimize:
 
         ax.set_title("State Space Per Generation")
         plt.show()
-            #self.visualize()
+
 
     def visualize(self):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
