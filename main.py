@@ -28,9 +28,9 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-6
 
-W = [.3, 2., 7., 3.]
+W = [10, 2., 11., 3.]
 
-numTestStates = 100
+numTestStates = 500
 numOfEpochs = 40
 
 
@@ -188,7 +188,7 @@ class Optimize:
         self.simulation = simulation
         self.parameters = simulation.controller.parameters()
         self.optimizer = optim.LBFGS(self.parameters, lr=0.01)
-
+#try adam
     def step(self):
         def closure():
             loss = self.simulation(self.simulation.state)
@@ -227,6 +227,7 @@ class Optimize:
         plt.plot(epochNum, lossArray)
         plt.show()
 
+
         stateNames = ["X", "V_X", "Y", "V_Y"]
         fig, ax = plt.subplots(figsize=(18, 10))
         im = ax.imshow(combAvgSS.T)
@@ -262,15 +263,17 @@ class Optimize:
         plt.ylabel('Y')
         plt.title(Epoch+1)
         plt.plot((0), 'r.')
-        #plt.show()
-
+        plt.xlim([-5, 5])
+        plt.ylim([-5, 5])
+        plt.show()
+        plt.clf()
 
 # Now it's time to run the code!
 
-T = 100  # number of time steps
+T = 50  # number of time steps
 dim_input = 5  # state space dimensions
 dim_hidden = 8  # latent dimensions
-dim_h2 = 10
+dim_h2 = 5
 dim_output = 2  # action space dimensions
 d = Dynamics()  # define dynamics
 c = Controller(dim_input, dim_hidden,dim_h2, dim_output)  # define controller
