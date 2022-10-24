@@ -20,7 +20,7 @@ BOOST_ACCEL = 0.4  # thrust constant
 
 PLATFORM_WIDTH = 0.25  # landing platform width
 PLATFORM_HEIGHT = 0.6  # landing platform height
-ROTATION_ACCEL = 20  # rotation constant
+ROTATION_ACCEL = 10 # rotation constant
 
 airDensitySeaLevel = .012250
 terminalVel = 1000  # terminal velocity at sea level
@@ -28,7 +28,7 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-6
 
-W = [.5, 2., 7., 3.]
+W = [.3, 2., 7., 3.]
 
 numTestStates = 100
 numOfEpochs = 40
@@ -202,10 +202,11 @@ class Optimize:
 
     def train(self, epochs,T):
 
-
+        lossArray= np.zeros(numOfEpochs)
         combAvgSS = np.empty((0, 4), float)
         for epoch in range(epochs):
             loss = self.step()
+            lossArray[epoch]= loss
             print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss/numTestStates))
             StateSpace=np.array([self.simulation.state_trajectory[T-1].detach().numpy() ])
 
@@ -219,9 +220,13 @@ class Optimize:
 
 
             combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
+            plt.figure(1)
             self.visualize(T, epoch)
-
         epochNum = np.linspace(1, epochs, epochs)
+        plt.figure(2)
+        plt.plot(epochNum, lossArray)
+        plt.show()
+
         stateNames = ["X", "V_X", "Y", "V_Y"]
         fig, ax = plt.subplots(figsize=(18, 10))
         im = ax.imshow(combAvgSS.T)
