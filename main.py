@@ -1,14 +1,14 @@
 # overhead
 
 import logging
-import math
+#import math
 import random
 import numpy as np
-import time
+#import time
 import torch as t
 import torch.nn as nn
 from torch import optim
-from torch.nn import utils
+#from torch.nn import utils
 import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 FRAME_TIME = 0.1  # time interval
 GRAVITY_ACCEL = 0.12  # gravity constant
-BOOST_ACCEL = 0.18  # thrust constant
+BOOST_ACCEL = 0.4  # thrust constant
 
 PLATFORM_WIDTH = 0.25  # landing platform width
 PLATFORM_HEIGHT = 0.6  # landing platform height
@@ -28,7 +28,7 @@ C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
 
 airDensityConstant = -1.186*10**-6
 
-W = [1., 2., 1., 3.]
+W = [.5, 2., 7., 3.]
 
 numTestStates = 100
 numOfEpochs = 40
