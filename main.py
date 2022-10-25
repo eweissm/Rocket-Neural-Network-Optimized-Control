@@ -219,7 +219,7 @@ class Optimize:
             avgSS[0, 2] = np.mean(StateSpace[:, :, 2])
             avgSS[0, 3] = np.mean(StateSpace[:, :, 3])
 
-            print(avgSS)
+            print('Averages of State Space: %s ' %(avgSS))
 
             combAvgSS = np.append(combAvgSS, avgSS, axis=0)
             plt.figure(1)
