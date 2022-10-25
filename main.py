@@ -30,8 +30,8 @@ airDensityConstant = -1.186 * 10 ** -6
 
 W = [11, 2., 11., 3.]
 
-numTestStates = 500
-numOfEpochs = 40
+numTestStates = 1000
+numOfEpochs = 100
 
 
 # define system dynamics
@@ -191,7 +191,7 @@ class Optimize:
     def __init__(self, simulation):
         self.simulation = simulation
         self.parameters = simulation.controller.parameters()
-        self.optimizer = optim.LBFGS(self.parameters, lr=0.01)
+        self.optimizer = optim.Adamax(self.parameters, lr=0.01)
 
     # try adam
     def step(self):
@@ -228,45 +228,76 @@ class Optimize:
         plt.figure(2)
         plt.plot(epochNum, lossArray)
         plt.show()
-
-        stateNames = ["X", "V_X", "Y", "V_Y"]
-        fig, ax = plt.subplots(figsize=(18, 10))
-        im = ax.imshow(combAvgSS.T)
-
-        cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn", orientation="horizontal")
-
-        # Show all ticks and label them with the respective list entries
-        ax.set_xticks(np.arange(len(epochNum)), labels=epochNum)
-        ax.set_yticks(np.arange(len(stateNames)), labels=stateNames)
-
-        # Rotate the tick labels and set their alignment.
-        plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
-
-        # for i in range(len(stateNames)):
-        #     for j in range(len(epochNum)):
-        #         text = ax.text(j,i, combAvgSS.T[i, j], ha="center", va="center", color="w", fontsize="x-small")
-
-        ax.set_title("State Space Per Generation")
-        plt.show()
-
+        # combAvgPOS=np.array([combAvgSS[:,0],combAvgSS[:,2] ])
+        # combAvgVel = np.array([combAvgSS[:, 1], combAvgSS[:, 3]])
+        #
+        # PosNames = ["X", "Y"]
+        # fig, ax = plt.subplots(figsize=(18, 10))
+        # im = ax.imshow(combAvgPOS)
+        #
+        # cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn", orientation="horizontal")
+        #
+        # # Show all ticks and label them with the respective list entries
+        # ax.set_xticks(np.arange(len(epochNum)), labels=epochNum)
+        # ax.set_yticks(np.arange(len(PosNames)), labels=PosNames)
+        #
+        # # Rotate the tick labels and set their alignment.
+        # plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
+        #
+        # # for i in range(len(stateNames)):
+        # #     for j in range(len(epochNum)):
+        # #         text = ax.text(j,i, combAvgSS.T[i, j], ha="center", va="center", color="w", fontsize="x-small")
+        #
+        # ax.set_title("State Space for Positions Per Generation")
+        # plt.show()
+        #
+        # velNames = [ "V_X", "V_Y"]
+        # fig, ax2 = plt.subplots(figsize=(18, 10))
+        # im = ax2.imshow(combAvgVel)
+        #
+        # cbar = ax2.figure.colorbar(im, ax=ax2, cmap="YlGn", orientation="horizontal")
+        #
+        # # Show all ticks and label them with the respective list entries
+        # ax2.set_xticks(np.arange(len(epochNum)), labels=epochNum)
+        # ax2.set_yticks(np.arange(len(velNames)), labels=velNames)
+        #
+        # # Rotate the tick labels and set their alignment.
+        # plt.setp(ax2.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
+        #
+        # # for i in range(len(stateNames)):
+        # #     for j in range(len(epochNum)):
+        # #         text = ax.text(j,i, combAvgSS.T[i, j], ha="center", va="center", color="w", fontsize="x-small")
+        #
+        # ax2.set_title("State Space for Velocities Per Generation")
+        # #plt.show()
     def visualize(self, T, Epoch):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
 
         x = data[T - 1, :, 0]
-        vx = data[:, 1]
+        vx = data[T - 1, :, 1]
         y = data[T - 1, :, 2]
-        vy = data[:, 3]
-
+        vy = data[T - 1, :, 3]
+        plt.figure(3)
         plt.plot(x, y, 'k.')
         plt.xlabel('X')
         plt.ylabel('Y')
         plt.title(Epoch + 1)
-        plt.plot((0), 'r.')
+        plt.plot((PLATFORM_HEIGHT), 'r.')
         plt.xlim([-5, 5])
         plt.ylim([-5, 5])
         plt.show()
         plt.clf()
 
+        plt.figure(4)
+        plt.plot(vx, vy, 'k.')
+        plt.xlabel('V_X')
+        plt.ylabel('V_Y')
+        plt.title(Epoch + 1)
+        plt.plot((0), 'r.')
+        plt.xlim([-2, 2])
+        plt.ylim([-2, 2])
+        plt.show()
+        plt.clf()
 
 # Now it's time to run the code!
 
