@@ -387,30 +387,43 @@ $$ min_\phi \ e $$
  
  Epoch 1:
 
-![image](https://user-images.githubusercontent.com/73143081/197681399-8a3cd884-1cf1-4058-b751-25883dd2ea95.png)
-![image](https://user-images.githubusercontent.com/73143081/197681425-8d05ce7d-bf03-4f69-bac5-10bfae946b8f.png)
+![image](https://user-images.githubusercontent.com/73143081/197682132-c7e0bbca-d2f7-4109-ad36-c1afe22fd84d.png)
+![image](https://user-images.githubusercontent.com/73143081/197682151-2384e785-6656-49c2-821f-045b0ab1f460.png)
+
 
 Epoch 10:
 
+![image](https://user-images.githubusercontent.com/73143081/197682187-d9c2d578-1175-43e6-8e70-2507f7b702f3.png)
+![image](https://user-images.githubusercontent.com/73143081/197682195-449b5097-b7d7-4d39-8c0e-821ded9a28d4.png)
 
 
 Epoch 20:
 
+![image](https://user-images.githubusercontent.com/73143081/197682238-10704aa5-937a-49f2-8cc8-6ee06e457d62.png)
+![image](https://user-images.githubusercontent.com/73143081/197682254-c242a92a-1c5e-4bec-8b58-1f73803c0c33.png)
 
 
 Epoch 30:
 
+![image](https://user-images.githubusercontent.com/73143081/197682283-eab98b35-ba05-4bae-b4b6-09203d608067.png)
+![image](https://user-images.githubusercontent.com/73143081/197682287-6adb3b17-6a2a-43f4-816e-f47a8fab8c59.png)
 
 
 Epoch 40:
 
+![image](https://user-images.githubusercontent.com/73143081/197682305-7d4b9b86-07e5-4d5e-9693-4bc17f2ecc46.png)
+![image](https://user-images.githubusercontent.com/73143081/197682310-be0f94a4-df25-49a9-ace5-a0abb5889c01.png)
 
- 
- 
+![image](https://user-images.githubusercontent.com/73143081/197682335-e5587b76-6000-4574-8021-f9fc176dd308.png)
+![image](https://user-images.githubusercontent.com/73143081/197682344-0b3670db-97b4-470b-bba2-3beaee5950e0.png)
 
+ Clearly this algorithm is not perfect as seen by the spikes up in the loss and the inability of the code to significantly minimize the final velocities. Additionally, although not shown above, many times the program will fail entirely and diverge away from the target solution. There are mutliple reasons for this. The first is because of LBFGS does not use a line search, but instead uses a fixed step size. Likewise, tuning the weights and the network dimensions are difficult and lead a lot instability in the minimization. 
  
  ### AdaMax:
- 
+  See Adamax Optimization.ipynb for raw results
+
+This simulation converged
+ The graphs below shows the states of the rockets from each generation at T_max:
   
 EXPLAIN: different optimization programs used, how they performed, why some performed better, show results, tanh is bad
 
