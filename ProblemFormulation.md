@@ -55,3 +55,7 @@ Where W is a vector containing the weights of each state.
 Therefore, the objective is:
 
 $$ min_\phi \ e $$
+
+
+EXPLAIN: different optimization programs used, how they performed, why some performed better, show results
+
