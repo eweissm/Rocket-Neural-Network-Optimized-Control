@@ -417,11 +417,13 @@ Epoch 40:
 ![image](https://user-images.githubusercontent.com/73143081/197682335-e5587b76-6000-4574-8021-f9fc176dd308.png)
 ![image](https://user-images.githubusercontent.com/73143081/197682344-0b3670db-97b4-470b-bba2-3beaee5950e0.png)
 
- 
-
+ Clearly this algorithm is not perfect as seen by the spikes up in the loss and the inability of the code to significantly minimize the final velocities. Additionally, although not shown above, many times the program will fail entirely and diverge away from the target solution. There are mutliple reasons for this. The first is because of LBFGS does not use a line search, but instead uses a fixed step size. Likewise, tuning the weights and the network dimensions are difficult and lead a lot instability in the minimization. 
  
  ### AdaMax:
- 
+  See Adamax Optimization.ipynb for raw results
+
+This simulation converged
+ The graphs below shows the states of the rockets from each generation at T_max:
   
 EXPLAIN: different optimization programs used, how they performed, why some performed better, show results, tanh is bad
 
