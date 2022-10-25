@@ -1,14 +1,14 @@
 # overhead
 
 import logging
-#import math
+# import math
 import random
 import numpy as np
-#import time
+# import time
 import torch as t
 import torch.nn as nn
 from torch import optim
-#from torch.nn import utils
+# from torch.nn import utils
 import matplotlib.pyplot as plt
 
 logger = logging.getLogger(__name__)
@@ -20,21 +20,20 @@ BOOST_ACCEL = 0.4  # thrust constant
 
 PLATFORM_WIDTH = 0.25  # landing platform width
 PLATFORM_HEIGHT = 0.6  # landing platform height
-ROTATION_ACCEL = 10 # rotation constant
+ROTATION_ACCEL = 10  # rotation constant
 
 airDensitySeaLevel = .012250
 terminalVel = 1000  # terminal velocity at sea level
-C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel**2)
+C_d = GRAVITY_ACCEL / (airDensitySeaLevel * terminalVel ** 2)
 
-airDensityConstant = -1.186*10**-6
+airDensityConstant = -1.186 * 10 ** -6
 
-W = [10, 2., 11., 3.]
+W = [11, 2., 11., 3.]
 
 numTestStates = 500
 numOfEpochs = 40
 
 
-# TODO: stop Nan solutions for loss. Compute gradient as scalar or do vector operation. Tune possible starting states to be reasonable for rocket. Tune air density
 # define system dynamics
 # Notes:
 # 0. You only need to modify the "forward" function
@@ -77,21 +76,23 @@ class Dynamics(nn.Module):
 
         # Theta
         state_tensor_drag = t.zeros((N, 5))
-        state_tensor_drag[:, 1] = - C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 1], state[:, 1]))
+        state_tensor_drag[:, 1] = - C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)),
+                                                                     t.mul(state[:, 1], state[:, 1]))
 
-        state_tensor_drag[:, 3] = C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)), t.mul(state[:, 3], state[:, 3]))
+        state_tensor_drag[:, 3] = C_d * airDensitySeaLevel * t.mul(t.exp(t.mul(state[:, 2], airDensityConstant)),
+                                                                   t.mul(state[:, 3], state[:, 3]))
         delta_state_drag = FRAME_TIME * state_tensor_drag
 
-        delta_state_theta = FRAME_TIME*ROTATION_ACCEL * t.mul(t.tensor([0., 0., 0., 0, -1.]), action[:, 1].reshape(-1, 1))
-        #should 1 be neg???^^^^
+        delta_state_theta = FRAME_TIME * ROTATION_ACCEL * t.mul(t.tensor([0., 0., 0., 0, -1.]),
+                                                                action[:, 1].reshape(-1, 1))
 
         state = state + delta_state_acc + delta_state_gravity + delta_state_theta + delta_state_drag
         # Update state
         step_mat = t.tensor([[1., FRAME_TIME, 0., 0., 0.],
-                                 [0., 1., 0., 0., 0.],
-                                 [0., 0., 1., FRAME_TIME, 0.],
-                                 [0., 0., 0., 1., 0.],
-                                 [0., 0., 0., 0., 1.]])
+                             [0., 1., 0., 0., 0.],
+                             [0., 0., 1., FRAME_TIME, 0.],
+                             [0., 0., 0., 1., 0.],
+                             [0., 0., 0., 0., 1.]])
 
         state = t.matmul(step_mat, t.transpose(state, 0, 1))
 
@@ -170,10 +171,13 @@ class Simulation(nn.Module):
         return t.tensor(states, requires_grad=False).float()
 
     def error(self, state):
-        errorCumulative = sum(W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2)
-        #print(errorCumulative)
+        errorCumulative = sum(
+            W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[
+                3] * state[:, 3] ** 2)
+        # print(errorCumulative)
 
         return errorCumulative
+
 
 # set up the optimizer
 # Note:
@@ -188,7 +192,8 @@ class Optimize:
         self.simulation = simulation
         self.parameters = simulation.controller.parameters()
         self.optimizer = optim.LBFGS(self.parameters, lr=0.01)
-#try adam
+
+    # try adam
     def step(self):
         def closure():
             loss = self.simulation(self.simulation.state)
@@ -199,27 +204,24 @@ class Optimize:
         self.optimizer.step(closure)
         return closure()
 
-
-    def train(self, epochs,T):
-
-        lossArray= np.zeros(numOfEpochs)
+    def train(self, epochs, T):
+        lossArray = np.zeros(numOfEpochs)
         combAvgSS = np.empty((0, 4), float)
         for epoch in range(epochs):
             loss = self.step()
-            lossArray[epoch]= loss
-            print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss/numTestStates))
-            StateSpace=np.array([self.simulation.state_trajectory[T-1].detach().numpy() ])
+            lossArray[epoch] = loss
+            print('[%d] Avg Loss per state: %.3f' % (epoch + 1, loss / numTestStates))
+            StateSpace = np.array([self.simulation.state_trajectory[T - 1].detach().numpy()])
 
-            avgSS =np.zeros([1,4])
-            avgSS[0, 0] = np.mean(StateSpace[:,:, 0])
-            avgSS[0, 1] = np.mean(StateSpace[:,:, 1])
-            avgSS[0, 2] = np.mean(StateSpace[:,:, 2])
-            avgSS[0, 3] = np.mean(StateSpace[:,:, 3])
+            avgSS = np.zeros([1, 4])
+            avgSS[0, 0] = np.mean(StateSpace[:, :, 0])
+            avgSS[0, 1] = np.mean(StateSpace[:, :, 1])
+            avgSS[0, 2] = np.mean(StateSpace[:, :, 2])
+            avgSS[0, 3] = np.mean(StateSpace[:, :, 3])
 
             print(avgSS)
 
-
-            combAvgSS = np.append(combAvgSS, avgSS, axis = 0)
+            combAvgSS = np.append(combAvgSS, avgSS, axis=0)
             plt.figure(1)
             self.visualize(T, epoch)
         epochNum = np.linspace(1, epochs, epochs)
@@ -227,20 +229,18 @@ class Optimize:
         plt.plot(epochNum, lossArray)
         plt.show()
 
-
         stateNames = ["X", "V_X", "Y", "V_Y"]
         fig, ax = plt.subplots(figsize=(18, 10))
         im = ax.imshow(combAvgSS.T)
 
-        cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn", orientation = "horizontal")
-
+        cbar = ax.figure.colorbar(im, ax=ax, cmap="YlGn", orientation="horizontal")
 
         # Show all ticks and label them with the respective list entries
         ax.set_xticks(np.arange(len(epochNum)), labels=epochNum)
         ax.set_yticks(np.arange(len(stateNames)), labels=stateNames)
 
-        #Rotate the tick labels and set their alignment.
-        plt.setp(ax.get_xticklabels(), rotation=90, ha="right",rotation_mode="anchor")
+        # Rotate the tick labels and set their alignment.
+        plt.setp(ax.get_xticklabels(), rotation=90, ha="right", rotation_mode="anchor")
 
         # for i in range(len(stateNames)):
         #     for j in range(len(epochNum)):
@@ -249,24 +249,24 @@ class Optimize:
         ax.set_title("State Space Per Generation")
         plt.show()
 
-
-    def visualize(self,T, Epoch):
+    def visualize(self, T, Epoch):
         data = np.array([self.simulation.state_trajectory[i].detach().numpy() for i in range(self.simulation.T)])
 
-        x = data[T-1,:, 0]
+        x = data[T - 1, :, 0]
         vx = data[:, 1]
-        y = data[T-1,:, 2]
+        y = data[T - 1, :, 2]
         vy = data[:, 3]
 
         plt.plot(x, y, 'k.')
         plt.xlabel('X')
         plt.ylabel('Y')
-        plt.title(Epoch+1)
+        plt.title(Epoch + 1)
         plt.plot((0), 'r.')
         plt.xlim([-5, 5])
         plt.ylim([-5, 5])
         plt.show()
         plt.clf()
+
 
 # Now it's time to run the code!
 
@@ -276,7 +276,7 @@ dim_hidden = 8  # latent dimensions
 dim_h2 = 5
 dim_output = 2  # action space dimensions
 d = Dynamics()  # define dynamics
-c = Controller(dim_input, dim_hidden,dim_h2, dim_output)  # define controller
+c = Controller(dim_input, dim_hidden, dim_h2, dim_output)  # define controller
 s = Simulation(c, d, T)  # define simulation
 o = Optimize(s)  # define optimizer
-o.train(numOfEpochs,T)  # solve the optimization problem
+o.train(numOfEpochs, T)  # solve the optimization problem
