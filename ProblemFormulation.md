@@ -422,8 +422,46 @@ Epoch 40:
  ### AdaMax:
   See Adamax Optimization.ipynb for raw results
 
-This simulation converged
+This simulation converged significantly slower, although luckly each generation was significantly cheaper to compute so I was able to run 600 generation long test in the same time as with LBFGS. This led to the following results:
+
  The graphs below shows the states of the rockets from each generation at T_max:
-  
+
+Epoch 1:
+![image](https://user-images.githubusercontent.com/73143081/198165437-b76d15af-e334-45f7-bb10-364dc149d9e9.png)
+![image](https://user-images.githubusercontent.com/73143081/198165440-c633e326-e38d-4f26-ab9e-7e46a1c2fc83.png)
+
+
+Epoch 100:
+![image](https://user-images.githubusercontent.com/73143081/198165456-a971c414-d8ff-4f2e-8fc3-22f35f6c5da8.png)
+![image](https://user-images.githubusercontent.com/73143081/198165460-5c6ebd1e-28e7-42b6-8b08-fdb7b137d1b1.png)
+
+
+Epoch 200:
+![image](https://user-images.githubusercontent.com/73143081/198165480-c2426b5f-77d1-4264-8be5-423b06dbcd48.png)
+![image](https://user-images.githubusercontent.com/73143081/198165490-8dd378d2-8ccc-4db0-a9db-c6adacfa1ab8.png)
+
+
+Epoch 300:
+![image](https://user-images.githubusercontent.com/73143081/198165500-ffd82f7d-6832-4d21-bef5-20e1a3c66f75.png)
+![image](https://user-images.githubusercontent.com/73143081/198165507-0b02dc8b-2a9c-4d18-b409-6e41e83c9e8e.png)
+
+
+Epoch 400:
+![image](https://user-images.githubusercontent.com/73143081/198165516-addeae42-3286-4386-a3c9-5cd157721ec8.png)
+![image](https://user-images.githubusercontent.com/73143081/198165524-162e96bc-0d13-42c0-ba66-572941c48590.png)
+
+
+Epoch 500:
+![image](https://user-images.githubusercontent.com/73143081/198165540-3d243b69-93f5-410b-8dfd-1be329835854.png)
+![image](https://user-images.githubusercontent.com/73143081/198165547-ec3a82dd-84ad-4063-bc19-06b6861c2a21.png)
+
+
+Epoch 600:
+![image](https://user-images.githubusercontent.com/73143081/198165559-56ca5c31-4fde-4ed5-9c23-0dcf4b3f6bc1.png)
+![image](https://user-images.githubusercontent.com/73143081/198165565-3650206f-788b-4b03-84b3-6886dee9b0ee.png)
+
+![image](https://user-images.githubusercontent.com/73143081/198165584-48892cbd-91c8-4862-9599-5dd980d84776.png)
+
+
 EXPLAIN: different optimization programs used, how they performed, why some performed better, show results, tanh is bad
 
