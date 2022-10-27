@@ -471,6 +471,4 @@ Loss Per Generation:
 
 ![image](https://user-images.githubusercontent.com/73143081/198165584-48892cbd-91c8-4862-9599-5dd980d84776.png)
 
-
-EXPLAIN: different optimization programs used, how they performed, why some performed better, show results, tanh is bad
-
+AdaMax converged significanly better than LBFGS and when running tests, it was much more likely to converge on any given test as compared to LBFGS. The rockets that failed be at the target state at T_max were probably because their initial starting state was non-recoverable, which is not covered in this project. 
