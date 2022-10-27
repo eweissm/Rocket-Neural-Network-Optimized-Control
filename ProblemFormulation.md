@@ -3,7 +3,7 @@ The goal of this project is to make a controller which lands a rocket at a landi
 
 ## State: 
 
-The current state, X, The rocket is made of the location of the rocket in relation to the target landing site (d_x and d_y), the current velocity of the rocket (v_x and v_y), and the rocket's angle (theta).
+The current state, X, of the rocket is made of the location of the rocket in relation to the target landing site (d_x and d_y), the current velocity of the rocket (v_x and v_y), and the rocket's angle (theta).
  
 $$X = [d_x, v_x, d_y, v_y, \theta]^T$$
 
@@ -44,7 +44,7 @@ $$ -\Delta\theta_{max} ^{\circ} \leq \Delta\theta \leq \Delta\theta_{max}^{\circ
 $$ t \leq T_{max} $$
 
 ## Target: 
-at $t = T_{max},\ X_T= [0, 0, Height\ of\ the\ Landing\ Pad, 0, 0]^T $
+at $t = T_{max},\ X_T= [0, 0, Height\ of\ the\ Landing\ Pad, 0]^T $
 
 ## Controller:
 
@@ -57,6 +57,12 @@ Where W is a vector containing the weights of each state.
 Therefore, the objective is:
 
 $$ min_\phi \ e $$
+
+In the code below e was calculated as:
+
+```
+e = sum(W[0] * state[:, 0] ** 2 + W[1] * state[:, 1] ** 2 + W[2] * (state[:, 2] - PLATFORM_HEIGHT) ** 2 + W[3] * state[:, 3] ** 2)
+```
 
 ## Code:
 ```
@@ -381,7 +387,7 @@ $$ min_\phi \ e $$
  
  
  ### LBFGS:
- See Notebook.ipynb for raw results
+ See Notebook.ipynb for raw results and specific code used for this example.
 
  The graphs below shows the states of the rockets from each generation at T_max:
  
@@ -420,7 +426,7 @@ Epoch 40:
  Clearly this algorithm is not perfect as seen by the spikes up in the loss and the inability of the code to significantly minimize the final velocities. Additionally, although not shown above, many times the program will fail entirely and diverge away from the target solution. There are mutliple reasons for this. The first is because of LBFGS does not use a line search, but instead uses a fixed step size. Likewise, tuning the weights and the network dimensions are difficult and lead a lot instability in the minimization. 
  
  ### AdaMax:
-  See Adamax Optimization.ipynb for raw results
+  See Adamax Optimization.ipynb for raw results and specific code used for this example.
 
 This simulation converged significantly slower, although luckly each generation was significantly cheaper to compute so I was able to run 600 generation long test in the same time as with LBFGS. This led to the following results:
 
